@@ -1,0 +1,44 @@
+### Login ADMIN
+> POST /auth/login
+> {"email":"admin@alertacheia.com","senha":"Admin@123"}
+< HTTP 200
+{"token":"eyJhbGciOi...(omitido)","tipo":"Bearer","expiraEmSegundos":28800,"usuario":{"id":1,"nome":"Defesa Civil","email":"admin@alertacheia.com","perfil":"ADMIN","telefone":"1199990000","bairroId":4,"bairroNome":"Vila Mariana"}}
+
+### Listar alertas sem token
+> GET /alertas
+< HTTP 401
+{"timestamp":"2026-11-16T22:14:44.357328","status":401,"erro":"Unauthorized","mensagem":"Token ausente, invalido ou expirado"}
+
+### Cidadao tentando criar sensor
+> POST /sensores  [Bearer token]
+> {"codigo":"RIO-009","tipo":"NIVEL_RIO","bairroId":1,"limiteAlerta":2,"limiteCritico":3}
+< HTTP 403
+{"timestamp":"2026-11-16T22:14:44.365388","status":403,"erro":"Forbidden","mensagem":"Voce nao tem permissao para esta acao"}
+
+### ADMIN cria sensor com limites invalidos
+> POST /sensores  [Bearer token]
+> {"codigo":"RIO-009","tipo":"NIVEL_RIO","bairroId":1,"limiteAlerta":3,"limiteCritico":2}
+< HTTP 400
+{"timestamp":"2026-11-16T22:14:44.367988","status":400,"erro":"Bad Request","mensagem":"limiteCritico deve ser maior que limiteAlerta"}
+
+### ADMIN cria sensor valido
+> POST /sensores  [Bearer token]
+> {"codigo":"RIO-009","tipo":"NIVEL_RIO","bairroId":4,"limiteAlerta":2,"limiteCritico":3}
+< HTTP 201
+{"id":6,"codigo":"RIO-009","tipo":"NIVEL_RIO","unidade":"m","bairroId":4,"bairroNome":"Vila Mariana","limiteAlerta":2,"limiteCritico":3,"ativo":true}
+
+### Sensor envia leitura critica
+> POST /leituras  [X-Sensor-Key]
+> {"codigoSensor":"RIO-009","valor":3.25}
+< HTTP 201
+{"id":17,"codigoSensor":"RIO-009","valor":3.25,"unidade":"m","dataHora":"2026-11-16T22:14:44.374881","situacao":"CRITICO","alertaGerado":{"id":3,"bairroId":4,"bairroNome":"Vila Mariana","severidade":"CRITICO","mensagem":"Nivel do rio em 3.25 m no bairro Vila Mariana. Risco alto de alagamento. Procure um abrigo ou local elevado.","status":"ATIVO","criadoEm":"2026-11-16T22:14:44.376332"}}
+
+### Situacao do bairro 4 (cidadao)
+> GET /bairros/4/situacao  [Bearer token]
+< HTTP 200
+{"bairro":{"id":4,"nome":"Vila Mariana","cidade":"Sao Paulo","nivelRisco":"BAIXO"},"situacao":"CRITICO","alertasAtivos":[{"id":3,"bairroId":4,"bairroNome":"Vila Mariana","severidade":"CRITICO","mensagem":"Nivel do rio em 3.25 m no bairro Vila Mariana. Risco alto de alagamento. Procure um abrigo ou local elevado.","status":"ATIVO","criadoEm":"2026-11-16T22:14:44.376332"}]}
+
+### Abrigo inexistente
+> GET /abrigos/999  [Bearer token]
+< HTTP 404
+{"timestamp":"2026-11-16T22:14:44.381234","status":404,"erro":"Not Found","mensagem":"Abrigo 999 nao encontrado"}

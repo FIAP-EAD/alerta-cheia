@@ -1,0 +1,473 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Alerta Cheia · Entregáveis · Global Solution 2026/2</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+<style>
+  @page { size: A4; margin: 16mm 15mm 18mm; }
+  :root { --azul: #0b5cab; --texto: #14202e; --suave: #556274; --borda: #d8e0ea; --fundo: #f3f6fa;
+          --verde: #13795b; --amarelo: #9a5b00; --vermelho: #b3261e; }
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: var(--texto);
+         font-size: 10.5pt; line-height: 1.5; margin: 0; }
+  h1, h2, h3 { line-height: 1.25; color: var(--texto); }
+  h2 { font-size: 18pt; margin: 0 0 4mm; padding-bottom: 2mm; border-bottom: 3px solid var(--azul); break-before: page; }
+  h2 small { display: block; font-size: 9.5pt; font-weight: 600; color: var(--azul); letter-spacing: .08em; text-transform: uppercase; }
+  h3 { font-size: 12.5pt; margin: 6mm 0 2mm; break-after: avoid; }
+  p { margin: 0 0 2.5mm; }
+  table { width: 100%; border-collapse: collapse; margin: 2mm 0 4mm; font-size: 9pt; break-inside: auto; }
+  th, td { border: 1px solid var(--borda); padding: 1.6mm 2mm; text-align: left; vertical-align: top; }
+  th { background: var(--fundo); font-weight: 700; }
+  tr { break-inside: avoid; }
+  code { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 8.6pt; background: var(--fundo); padding: 0 1mm; border-radius: 2px; }
+  pre { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 7.6pt; line-height: 1.4; background: #0e141b; color: #e8eef5;
+        padding: 3mm 4mm; border-radius: 3mm; white-space: pre-wrap; word-break: break-word; margin: 2mm 0 4mm; }
+  pre.claro { background: var(--fundo); color: var(--texto); border: 1px solid var(--borda); }
+  .ok { color: var(--verde); font-weight: 700; }
+  .tag { display: inline-block; padding: 0 2mm; border-radius: 99px; font-size: 8pt; font-weight: 700; background: var(--fundo); }
+  .tag-get { background: #e3f4ec; color: var(--verde); } .tag-post { background: #e1ecfa; color: var(--azul); }
+  .tag-put { background: #fff4dc; color: var(--amarelo); } .tag-del { background: #fde7e5; color: var(--vermelho); }
+  .nota { background: var(--fundo); border-left: 4px solid var(--azul); padding: 2.5mm 4mm; margin: 3mm 0; border-radius: 0 2mm 2mm 0; }
+
+  /* Capa */
+  .capa { height: 255mm; display: flex; flex-direction: column; justify-content: space-between; }
+  .capa-topo { font-size: 9.5pt; font-weight: 700; letter-spacing: .14em; color: var(--azul); text-transform: uppercase; }
+  .capa h1 { font-size: 40pt; margin: 0; color: var(--azul); letter-spacing: -.5pt; }
+  .capa .slogan { font-size: 15pt; color: var(--suave); margin-top: 2mm; }
+  .capa .logo { width: 26mm; height: 26mm; margin-bottom: 6mm; }
+  .capa table { font-size: 11pt; width: 70%; }
+  .capa-rodape { font-size: 10pt; color: var(--suave); }
+
+  .sumario ol { padding-left: 5mm; font-size: 11pt; line-height: 1.9; }
+  .grade-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; }
+  .cartao { border: 1px solid var(--borda); border-radius: 3mm; padding: 3mm 4mm; break-inside: avoid; }
+  .cartao h4 { margin: 0 0 1mm; font-size: 10.5pt; color: var(--azul); }
+  .cartao p { margin: 0; font-size: 9.5pt; }
+
+  .telas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; margin: 3mm 0; }
+  figure { margin: 0; break-inside: avoid; }
+  figure img { width: 100%; border: 1px solid var(--borda); border-radius: 3mm; display: block; }
+  figcaption { font-size: 8.5pt; color: var(--suave); margin-top: 1.5mm; line-height: 1.35; }
+  figcaption b { color: var(--texto); }
+  .larga img { border-radius: 2mm; }
+
+  .fluxo { display: flex; align-items: stretch; gap: 2mm; margin: 3mm 0 4mm; }
+  .fluxo div { flex: 1; border: 1px solid var(--borda); border-radius: 2mm; padding: 2mm 2.5mm; font-size: 8.6pt; background: #fff; }
+  .fluxo div b { display: block; color: var(--azul); font-size: 9pt; }
+  .fluxo span { align-self: center; color: var(--azul); font-weight: 700; }
+  pre.mermaid { display: flex; justify-content: center; margin: 2mm 0; background: #fff; color: var(--texto);
+                border: 1px solid var(--borda); padding: 2mm; font-family: inherit; }
+  .mermaid svg { width: 100% !important; max-width: 100% !important; height: auto; max-height: 150mm; }
+</style>
+</head>
+<body>
+
+<!-- ============ CAPA ============ -->
+<section class="capa">
+  <div>
+    <div class="capa-topo">FIAP · Global Solution 2026/2 · CitizenTech</div>
+  </div>
+  <div>
+    <svg class="logo" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#0b5cab"/><path d="M32 12c-8 11-14 19-14 27a14 14 0 0 0 28 0c0-8-6-16-14-27z" fill="#fff"/><path d="M14 50c4 0 4-3 9-3s5 3 9 3 5-3 9-3 5 3 9 3" stroke="#7cc4ff" stroke-width="3" fill="none" stroke-linecap="round"/></svg>
+    <h1>Alerta Cheia</h1>
+    <p class="slogan">O alerta chega antes da água.</p>
+    <p style="max-width:150mm;margin-top:6mm">CitizenTech que transforma sensores de nível de córrego e de chuva em alertas por bairro,
+      orientando moradores de áreas de risco até o abrigo com vaga mais próximo.</p>
+  </div>
+  <div>
+    <h3 style="margin-top:0">Integrantes · Turma 3ESOA</h3>
+    <table>
+      <tr><th>Nome</th><th>RM</th></tr>
+      <tr><td>Lucas</td><td>RM554589</td></tr>
+      <tr><td>Yuri Lopes</td><td>RM555522</td></tr>
+      <tr><td>Thiago</td><td>RM555485</td></tr>
+    </table>
+    <p><b>Vídeo pitch:</b> {{VIDEO}}</p>
+  </div>
+  <div class="capa-rodape">Engenharia de Software · 3º ano · Entrega em 19/11/2026</div>
+</section>
+
+<!-- ============ SUMARIO ============ -->
+<section class="sumario" style="break-before: page">
+  <h1 style="font-size:20pt;color:var(--azul)">Sumário</h1>
+  <ol start="0">
+    <li>A solução: cidadão, problema, ecossistema e impacto</li>
+    <li>Banco de dados: diagrama ER, script e consultas</li>
+    <li>API RESTful: camadas, endpoints e documentação</li>
+    <li>Plano de testes: casos, execução e evidências</li>
+    <li>Frontend mobile: telas, integração e usabilidade</li>
+    <li>Segurança: login, perfis e boas práticas</li>
+    <li>Simulação de IoT: sensores e uso dos dados</li>
+    <li>Como executar</li>
+  </ol>
+  <div class="nota">
+    O código-fonte completo está no <code>.zip</code>, com instruções no <code>README.md</code>:
+    <code>database/</code> (script Oracle), <code>api/</code> (Java 17 + Spring Boot),
+    <code>web/</code> (React), <code>iot/</code> (simulador) e <code>docs/</code> (este PDF e o OpenAPI).
+  </div>
+</section>
+
+<!-- ============ 0. SOLUCAO ============ -->
+<section>
+  <h2><small>Parte 0</small>A solução</h2>
+  <div class="grade-2">
+    <div class="cartao"><h4>Quem é o cidadão beneficiado</h4>
+      <p>Moradores de bairros às margens de córregos sujeitos a alagamento, em geral nas periferias,
+        onde o aviso costuma chegar quando a água já está dentro de casa. Inclui idosos e famílias sem carro,
+        que precisam de mais tempo para sair.</p></div>
+    <div class="cartao"><h4>Qual problema será resolvido</h4>
+      <p>Falta de aviso antecipado e localizado sobre enchentes e de informação sobre para onde ir.
+        O morador não sabe se o córrego está subindo nem qual abrigo ainda tem vaga.</p></div>
+    <div class="cartao"><h4>Como a solução funciona</h4>
+      <p>Sensores medem o nível do córrego e a chuva e enviam leituras para a API. Ao passar de um limite,
+        a API cria um alerta de <b>ATENÇÃO</b> ou <b>CRÍTICO</b> para o bairro. O app mostra a situação com
+        cores, lista os abrigos com vaga e permite que o morador envie relatos.</p></div>
+    <div class="cartao"><h4>Quais tecnologias serão usadas</h4>
+      <p>Oracle (banco relacional), Java 17 + Spring Boot (API REST, JPA, Spring Security, JWT, BCrypt,
+        Swagger), React (web mobile-first), Python (simulação de sensores) e JUnit + MockMvc (testes).</p></div>
+    <div class="cartao"><h4>Quem participa do ecossistema</h4>
+      <p><b>Moradores</b>, que recebem alertas e enviam relatos. <b>Defesa Civil</b> (perfil ADMIN), que
+        cadastra sensores e abrigos, encerra alertas e valida relatos. <b>Escolas, CEUs e igrejas</b>, que
+        servem de abrigo. <b>Prefeitura e subprefeituras</b>, que instalam os sensores.</p></div>
+    <div class="cartao"><h4>Como o impacto será medido e ampliado</h4>
+      <p>Métricas: antecedência média entre o alerta e o pico do córrego, moradores cadastrados por bairro de
+        risco, % de alertas confirmados por relatos e ocupação dos abrigos em cada evento. Para ampliar, basta
+        cadastrar novos bairros e sensores, sem mudar o código.</p></div>
+  </div>
+
+  <h3>Conexão com os ODS da ONU</h3>
+  <table>
+    <tr><th style="width:28%">ODS</th><th>Como o Alerta Cheia contribui</th></tr>
+    <tr><td><b>11</b> · Cidades e comunidades sustentáveis</td><td>Reduz o número de pessoas afetadas por desastres ligados à água (meta 11.5) com alerta antecipado e rota até o abrigo.</td></tr>
+    <tr><td><b>13</b> · Ação contra a mudança do clima</td><td>Aumenta a resiliência e a capacidade de adaptação a eventos climáticos extremos (meta 13.1), como chuvas intensas.</td></tr>
+    <tr><td><b>10</b> · Redução das desigualdades</td><td>Prioriza bairros periféricos de alto risco e funciona em celulares simples. Sem conexão, o app continua mostrando os últimos dados.</td></tr>
+  </table>
+  <div class="nota"><b>Simples, segura, inclusiva e acessível:</b> fonte grande, alto contraste, modo claro e escuro, suporte a leitor
+    de tela, senhas com hash, perfis de acesso e uso sem internet com os últimos dados salvos.</div>
+</section>
+
+<!-- ============ 1. BANCO ============ -->
+<section>
+  <h2><small>Parte 1 de 6 · 2 pontos</small>Banco de dados</h2>
+  <h3>Diagrama Entidade-Relacionamento</h3>
+  <p>São 7 entidades, normalizadas até a 3FN: cada tabela guarda um único assunto e não há atributos derivados nem repetidos.</p>
+  <pre class="mermaid">
+erDiagram
+  TB_BAIRRO ||--o{ TB_USUARIO : "tem moradores"
+  TB_BAIRRO ||--o{ TB_SENSOR : "monitorado por"
+  TB_BAIRRO ||--o{ TB_ABRIGO : "possui"
+  TB_BAIRRO ||--o{ TB_ALERTA : "recebe"
+  TB_BAIRRO ||--o{ TB_RELATO : "e citado em"
+  TB_SENSOR ||--o{ TB_LEITURA : "registra"
+  TB_LEITURA ||--o| TB_ALERTA : "gera (0 ou 1)"
+  TB_USUARIO ||--o{ TB_RELATO : "envia"
+  TB_BAIRRO {
+    NUMBER id PK
+    VARCHAR2 nome UK
+    VARCHAR2 cidade UK
+    VARCHAR2 nivel_risco "BAIXO|MEDIO|ALTO"
+  }
+  TB_USUARIO {
+    NUMBER id PK
+    VARCHAR2 nome
+    VARCHAR2 email UK
+    VARCHAR2 senha_hash "BCrypt"
+    VARCHAR2 perfil "ADMIN|CIDADAO"
+    VARCHAR2 telefone
+    NUMBER id_bairro FK
+    TIMESTAMP criado_em
+  }
+  TB_SENSOR {
+    NUMBER id PK
+    VARCHAR2 codigo UK
+    VARCHAR2 tipo "NIVEL_RIO|PLUVIOMETRO"
+    NUMBER id_bairro FK
+    NUMBER limite_alerta
+    NUMBER limite_critico
+    NUMBER ativo "0|1"
+  }
+  TB_LEITURA {
+    NUMBER id PK
+    NUMBER id_sensor FK
+    NUMBER valor
+    TIMESTAMP data_hora
+  }
+  TB_ALERTA {
+    NUMBER id PK
+    NUMBER id_bairro FK
+    NUMBER id_leitura FK,UK
+    VARCHAR2 severidade "ATENCAO|CRITICO"
+    VARCHAR2 mensagem
+    VARCHAR2 status "ATIVO|ENCERRADO"
+    TIMESTAMP criado_em
+  }
+  TB_ABRIGO {
+    NUMBER id PK
+    VARCHAR2 nome
+    VARCHAR2 endereco
+    NUMBER capacidade
+    NUMBER vagas_ocupadas
+    NUMBER id_bairro FK
+  }
+  TB_RELATO {
+    NUMBER id PK
+    NUMBER id_usuario FK
+    NUMBER id_bairro FK
+    VARCHAR2 descricao
+    VARCHAR2 status "ABERTO|VERIFICADO|DESCARTADO"
+    TIMESTAMP criado_em
+  }
+  </pre>
+
+  <h3>Cardinalidades e regras de negócio no banco</h3>
+  <table>
+    <tr><th style="width:38%">Relacionamento</th><th>Cardinalidade e regra</th></tr>
+    <tr><td>BAIRRO → USUARIO, SENSOR, ABRIGO, ALERTA, RELATO</td><td>1:N. Todo registro pertence a exatamente um bairro (FK NOT NULL).</td></tr>
+    <tr><td>SENSOR → LEITURA</td><td>1:N. Cada sensor registra muitas leituras ao longo do tempo.</td></tr>
+    <tr><td>LEITURA → ALERTA</td><td>1:0..1. Uma leitura gera no máximo um alerta (<code>UNIQUE(id_leitura)</code>).</td></tr>
+    <tr><td>USUARIO → RELATO</td><td>1:N. Um morador pode enviar vários relatos.</td></tr>
+  </table>
+  <table>
+    <tr><th style="width:38%">Constraint</th><th>Garante</th></tr>
+    <tr><td><code>ck_sensor_limites</code></td><td><code>limite_critico &gt; limite_alerta</code></td></tr>
+    <tr><td><code>ck_abrigo_vagas</code></td><td><code>0 ≤ vagas_ocupadas ≤ capacidade</code></td></tr>
+    <tr><td><code>ck_leitura_valor</code></td><td>Leituras não negativas</td></tr>
+    <tr><td><code>uk_usuario_email</code>, <code>uk_sensor_codigo</code>, <code>uk_bairro_nome_cidade</code></td><td>Ausência de duplicidade</td></tr>
+    <tr><td><code>CHECK ... IN (...)</code></td><td>Domínio dos campos de status, perfil, tipo, severidade e risco</td></tr>
+  </table>
+
+  <h3>Script <code>database/alerta_cheia.sql</code></h3>
+  <p>O script está organizado em quatro etapas e roda do início ao fim no SQL Developer (F5). Ele pode ser executado de novo sem erro.</p>
+  <ol>
+    <li><b>Limpeza:</b> faz DROP das tabelas e ignora o erro ORA-00942 (tabela inexistente).</li>
+    <li><b>Criação das tabelas:</b> CREATE TABLE com PK (IDENTITY), FK, UNIQUE, CHECK, DEFAULT e índices.</li>
+    <li><b>Carga inicial:</b> INSERTs com 4 bairros, 4 usuários, 5 sensores, 7 leituras, 3 alertas, 4 abrigos e 4 relatos.</li>
+    <li><b>Consultas:</b> as 7 consultas de uso da tabela abaixo.</li>
+  </ol>
+
+  <h3>Consultas de uso (7 SELECTs com JOIN e agregação)</h3>
+  <table>
+    <tr><th style="width:5%">#</th><th style="width:40%">Uso real</th><th>Recursos SQL</th></tr>
+    <tr><td>Q1</td><td>Tela "Meu bairro": alertas ativos, mais graves primeiro</td><td>JOIN, CASE no ORDER BY</td></tr>
+    <tr><td>Q2</td><td>Painel da Defesa Civil: média e máxima de chuva em 24 h por bairro</td><td>2 JOINs, AVG, MAX, COUNT, GROUP BY, INTERVAL</td></tr>
+    <tr><td>Q3</td><td>Ranking de bairros com mais alertas em 30 dias</td><td>LEFT JOIN, COUNT, SUM(CASE)</td></tr>
+    <tr><td>Q4</td><td>Ocupação dos abrigos por bairro (%)</td><td>JOIN, SUM, ROUND, GROUP BY</td></tr>
+    <tr><td>Q5</td><td>Última leitura de cada sensor com situação calculada</td><td>2 JOINs, subconsulta correlacionada com MAX, CASE</td></tr>
+    <tr><td>Q6</td><td>Relatos por bairro e status</td><td>JOIN, COUNT, GROUP BY de 2 colunas</td></tr>
+    <tr><td>Q7</td><td>Abrigos com vaga em bairros com alerta CRÍTICO ativo</td><td>JOIN, EXISTS</td></tr>
+  </table>
+  <pre class="claro">-- Q2. Media e maxima de chuva nas ultimas 24h por bairro
+SELECT b.nome AS bairro, ROUND(AVG(l.valor), 2) AS media_mm_h, MAX(l.valor) AS maxima_mm_h, COUNT(*) AS qtd_leituras
+  FROM TB_LEITURA l
+  JOIN TB_SENSOR s ON s.id = l.id_sensor
+  JOIN TB_BAIRRO b ON b.id = s.id_bairro
+ WHERE s.tipo = 'PLUVIOMETRO' AND l.data_hora &gt;= SYSTIMESTAMP - INTERVAL '24' HOUR
+ GROUP BY b.nome
+ ORDER BY maxima_mm_h DESC;
+
+-- Q5. Ultima leitura de cada sensor, com situacao calculada
+SELECT s.codigo, s.tipo, b.nome AS bairro, l.valor, l.data_hora,
+       CASE WHEN l.valor &gt;= s.limite_critico THEN 'CRITICO'
+            WHEN l.valor &gt;= s.limite_alerta  THEN 'ATENCAO' ELSE 'NORMAL' END AS situacao
+  FROM TB_SENSOR s
+  JOIN TB_BAIRRO b  ON b.id = s.id_bairro
+  JOIN TB_LEITURA l ON l.id_sensor = s.id
+ WHERE l.data_hora = (SELECT MAX(l2.data_hora) FROM TB_LEITURA l2 WHERE l2.id_sensor = s.id);</pre>
+  <p>As outras 5 consultas estão comentadas no final do script.</p>
+</section>
+
+<!-- ============ 2. API ============ -->
+<section>
+  <h2><small>Parte 2 de 6 · 4 pontos</small>API RESTful</h2>
+  <p>A API foi feita em Java 17 com Spring Boot 3.5 (Web, Data JPA, Validation e Security). Cada entidade do banco é um recurso da API, e o app web consome essa mesma API.</p>
+
+  <h3>Camadas</h3>
+  <div class="fluxo">
+    <div><b>Controller</b>Recebe o HTTP, valida o DTO com <code>@Valid</code>, aplica o perfil com <code>@PreAuthorize</code> e devolve o status.</div><span>→</span>
+    <div><b>Service</b>Regras de negócio, como gerar alertas, impedir duplicados e validar vagas e limites. Também controla as transações.</div><span>→</span>
+    <div><b>Repository</b>Spring Data JPA, com consultas derivadas e JPQL parametrizado.</div><span>→</span>
+    <div><b>Oracle</b>Entidades JPA mapeadas para as tabelas <code>TB_*</code>.</div>
+  </div>
+  <p>Pacotes de apoio:</p>
+  <ul>
+    <li><code>dto</code>: records de entrada e saída. A entidade nunca é exposta diretamente.</li>
+    <li><code>exception</code>: <code>GlobalExceptionHandler</code>, que padroniza as respostas de erro.</li>
+    <li><code>security</code>: filtro JWT e configuração do Spring Security.</li>
+    <li><code>config</code>: Swagger e carga de dados do perfil <code>dev</code>.</li>
+  </ul>
+
+  <h3>Endpoints (27 operações, cobrindo GET, POST, PUT e DELETE)</h3>
+  <table>
+    <tr><th style="width:12%">Método</th><th style="width:30%">Rota</th><th style="width:16%">Acesso</th><th>Descrição</th></tr>
+    <tr><td><span class="tag tag-post">POST</span></td><td><code>/auth/register</code></td><td>público</td><td>Cadastra um cidadão (201, 400, 409)</td></tr>
+    <tr><td><span class="tag tag-post">POST</span></td><td><code>/auth/login</code></td><td>público</td><td>Devolve o token JWT (200, 401)</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/usuarios/me</code></td><td>logado</td><td>Dados do usuário logado</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/bairros</code>, <code>/bairros/{id}</code></td><td>público / logado</td><td>Lista e detalha bairros</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/bairros/{id}/situacao</code></td><td>logado</td><td>NORMAL, ATENÇÃO ou CRÍTICO, com os alertas ativos</td></tr>
+    <tr><td><span class="tag tag-post">POST</span> <span class="tag tag-put">PUT</span> <span class="tag tag-del">DELETE</span></td><td><code>/bairros[/{id}]</code></td><td>ADMIN</td><td>CRUD de bairros (409 se houver vínculos)</td></tr>
+    <tr><td><span class="tag tag-get">GET</span> <span class="tag tag-post">POST</span> <span class="tag tag-put">PUT</span> <span class="tag tag-del">DELETE</span></td><td><code>/sensores[/{id}]</code></td><td>ADMIN</td><td>CRUD de sensores com validação dos limites</td></tr>
+    <tr><td><span class="tag tag-post">POST</span></td><td><code>/leituras</code></td><td>sensor</td><td>Recebe a leitura (header <code>X-Sensor-Key</code>) e gera alerta</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/leituras?sensorId=</code></td><td>logado</td><td>Últimas 50 leituras do sensor</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/alertas?bairroId=&amp;status=</code>, <code>/alertas/{id}</code></td><td>logado</td><td>Lista com filtros opcionais e detalhe</td></tr>
+    <tr><td><span class="tag tag-put">PUT</span></td><td><code>/alertas/{id}/encerrar</code></td><td>ADMIN</td><td>Encerra um alerta (409 se já estiver encerrado)</td></tr>
+    <tr><td><span class="tag tag-get">GET</span></td><td><code>/abrigos?bairroId=&amp;somenteComVaga=</code>, <code>/abrigos/{id}</code></td><td>logado</td><td>Lista e detalha abrigos</td></tr>
+    <tr><td><span class="tag tag-post">POST</span> <span class="tag tag-put">PUT</span> <span class="tag tag-del">DELETE</span></td><td><code>/abrigos[/{id}]</code></td><td>ADMIN</td><td>CRUD de abrigos (400 se ocupadas &gt; capacidade)</td></tr>
+    <tr><td><span class="tag tag-post">POST</span> <span class="tag tag-get">GET</span></td><td><code>/relatos</code></td><td>logado</td><td>Envia relato. ADMIN vê todos e o cidadão vê os próprios</td></tr>
+    <tr><td><span class="tag tag-put">PUT</span></td><td><code>/relatos/{id}/status</code></td><td>ADMIN</td><td>Marca como VERIFICADO ou DESCARTADO</td></tr>
+    <tr><td><span class="tag tag-del">DELETE</span></td><td><code>/relatos/{id}</code></td><td>dono / ADMIN</td><td>Exclui o relato (403 se for de outra pessoa)</td></tr>
+  </table>
+
+  <h3>Respostas e validação</h3>
+  <table>
+    <tr><th style="width:18%">Status</th><th>Quando</th></tr>
+    <tr><td>200 / 201 / 204</td><td>Sucesso em leitura, criação ou exclusão</td></tr>
+    <tr><td>400</td><td>Bean Validation falhou (o JSON traz o campo <code>campos</code> com o erro de cada campo), JSON mal formado ou regra de negócio violada</td></tr>
+    <tr><td>401</td><td>Sem token, token inválido ou expirado, login inválido ou chave do sensor ausente</td></tr>
+    <tr><td>403</td><td>Usuário autenticado sem o perfil necessário</td></tr>
+    <tr><td>404 / 409</td><td>Recurso inexistente / conflito (email ou código duplicado, registro com vínculos)</td></tr>
+  </table>
+
+  <h3>Documentação: Swagger / OpenAPI</h3>
+  <p>A interface fica em <code>http://localhost:8080/swagger-ui.html</code>, com o botão <b>Authorize</b> para colar o token JWT. A especificação exportada está em <code>docs/openapi.json</code> e pode ser importada no Postman em <i>Import → OpenAPI</i>.</p>
+  <figure class="larga"><img src="img/12-swagger.png" alt="Swagger UI da API Alerta Cheia"><figcaption><b>Swagger UI</b> com todos os endpoints agrupados por recurso.</figcaption></figure>
+</section>
+
+<!-- ============ 3. TESTES ============ -->
+<section>
+  <h2><small>Parte 3 de 6 · 2 pontos</small>Plano de testes</h2>
+  <p>Os testes são automatizados com <b>JUnit 5 + MockMvc</b>, cobrindo a API inteira (controller → service → repository → banco H2) e a regra de classificação. Para rodar: <code>cd api &amp;&amp; mvn test</code>. O relatório é gerado em <code>api/target/surefire-reports/</code>.</p>
+  <table>
+    <tr><th style="width:6%">ID</th><th style="width:24%">Cenário</th><th style="width:27%">Entrada</th><th style="width:29%">Saída esperada</th><th style="width:8%">Tipo</th><th style="width:6%">Status</th></tr>
+    <tr><td>CT01</td><td>Cadastro de cidadão válido</td><td>POST /auth/register com dados válidos</td><td>201, perfil CIDADAO e sem senha nem hash na resposta</td><td>Auto</td><td class="ok">Passou</td></tr>
+    <tr><td>CT02</td><td>Email já cadastrado</td><td>POST /auth/register com maria@email.com</td><td>409 Conflict</td><td>Auto</td><td class="ok">Passou</td></tr>
+    <tr><td>CT03</td><td>Dados inválidos no cadastro</td><td>email "nao-e-email", senha "123"</td><td>400 com <code>campos.email</code> e <code>campos.senha</code></td><td>Auto</td><td class="ok">Passou</td></tr>
+    <tr><td>CT04</td><td>Login com senha errada</td><td>POST /auth/login com senha incorreta</td><td>401 "Email ou senha invalidos"</td><td>Auto</td><td class="ok">Passou</td></tr>
+    <tr><td>CT05</td><td>Rota protegida sem token</td><td>GET /alertas sem Authorization</td><td>401</td><td>Auto</td><td class="ok">Passou</td></tr>
+    <tr><td>CT06</td><td>Cidadão tenta excluir sensor</td><td>DELETE /sensores/1 com token CIDADAO</td><td>403 Forbidden</td><td>Auto</td><td class="ok">Passou</td></tr>
+    <tr><td>CT07</td><td>Leitura acima do limite crítico</td><td>POST /leituras RIO-002 = 3.40 m</td><td>201, situação CRITICO, alerta gerado e bairro 2 com situação CRITICO</td><td>Auto</td><td class="ok">Passou</td></tr>
+    <tr><td>CT08</td><td>Leitura normal</td><td>POST /leituras CHUVA-003 = 5.0</td><td>201, situação NORMAL e <code>alertaGerado = null</code></td><td>Auto</td><td class="ok">Passou</td></tr>
+    <tr><td>CT09</td><td>Não duplicar alerta</td><td>2 leituras críticas seguidas no mesmo bairro</td><td>A segunda não gera alerta</td><td>Auto</td><td class="ok">Passou</td></tr>
+    <tr><td>CT10</td><td>Sensor sem chave</td><td>POST /leituras sem X-Sensor-Key</td><td>401</td><td>Auto</td><td class="ok">Passou</td></tr>
+    <tr><td>CT11</td><td>Abrigo inválido</td><td>POST /abrigos com capacidade 10 e ocupadas 20</td><td>400</td><td>Auto</td><td class="ok">Passou</td></tr>
+    <tr><td>CT12</td><td>Tentativa de XSS no relato</td><td>descrição com <code>&lt;script&gt;alert(1)&lt;/script&gt;</code></td><td>201 com o texto salvo escapado (<code>&amp;lt;script&amp;gt;</code>)</td><td>Auto</td><td class="ok">Passou</td></tr>
+    <tr><td>CT13</td><td>Recurso inexistente</td><td>GET /abrigos/9999</td><td>404</td><td>Auto</td><td class="ok">Passou</td></tr>
+    <tr><td>CT14</td><td>Classificação: abaixo do limite</td><td>rio 1.99 m (limites 2/3)</td><td>sem severidade</td><td>Unid.</td><td class="ok">Passou</td></tr>
+    <tr><td>CT15</td><td>Classificação: no limite de alerta</td><td>rio 2.00 m</td><td>ATENCAO</td><td>Unid.</td><td class="ok">Passou</td></tr>
+    <tr><td>CT16</td><td>Classificação: crítico</td><td>rio 3.00 m e 5.50 m</td><td>CRITICO</td><td>Unid.</td><td class="ok">Passou</td></tr>
+    <tr><td>CT17</td><td>Fluxo IoT ponta a ponta</td><td>simulador <code>--cenario enchente</code></td><td>Alerta ATENÇÃO e depois CRÍTICO, com o app mudando de cor</td><td>Manual</td><td class="ok">Passou</td></tr>
+    <tr><td>CT18</td><td>App sem conexão</td><td>Rede derrubada com a tela inicial aberta</td><td>Aviso "Sem conexão" mostrando os últimos dados</td><td>Manual</td><td class="ok">Passou</td></tr>
+  </table>
+
+  <h3>Execução: relatório do Maven Surefire</h3>
+  <pre>{{SUREFIRE}}</pre>
+
+  <h3>Evidências: testes manuais da API (requisição e resposta reais)</h3>
+  <pre>{{LOG_API}}</pre>
+  <p>As evidências dos testes CT17 e CT18 estão nas Partes 4 e 6 (telas 03, 04 e 08 e o log do simulador).</p>
+</section>
+
+<!-- ============ 4. FRONTEND ============ -->
+<section>
+  <h2><small>Parte 4 de 6 · 3 pontos</small>Frontend mobile</h2>
+  <p>O app é web mobile-first, feito em <b>React 18 + React Router</b> (Vite), e consome somente a API do grupo. As telas abaixo foram capturadas em 390 × 844 px (tamanho de celular), com o app ligado à API.</p>
+  <div class="telas">
+    <figure><img src="img/01-login.png"><figcaption><b>01 · Login.</b> Envia para <code>POST /auth/login</code> e guarda o token.</figcaption></figure>
+    <figure><img src="img/02-cadastro-validacao.png"><figcaption><b>02 · Cadastro.</b> Validação em cada campo. Os bairros vêm de <code>GET /bairros</code>.</figcaption></figure>
+    <figure><img src="img/03-inicio-normal.png"><figcaption><b>03 · Início (Normal).</b> Situação do bairro, atualizada a cada 10 s.</figcaption></figure>
+    <figure><img src="img/04-inicio-critico.png"><figcaption><b>04 · Início (Crítico).</b> Mesma tela após o simulador: card vermelho e atalho para os abrigos.</figcaption></figure>
+    <figure><img src="img/05-alerta-detalhe.png"><figcaption><b>05 · Detalhe do alerta.</b> Mensagem e abrigos com vaga no bairro.</figcaption></figure>
+    <figure><img src="img/06-abrigos.png"><figcaption><b>06 · Abrigos.</b> Barra de ocupação, vagas e link "Como chegar".</figcaption></figure>
+    <figure><img src="img/07-relatos.png"><figcaption><b>07 · Relatos.</b> Grava pela API (<code>POST /relatos</code>) e mostra o toast de confirmação.</figcaption></figure>
+    <figure><img src="img/08-offline.png"><figcaption><b>08 · Sem conexão.</b> Mostra o último status salvo e o botão "Tentar de novo".</figcaption></figure>
+    <figure><img src="img/09-admin-alertas.png"><figcaption><b>09 · Gestão (ADMIN).</b> Alertas ativos com o botão "Encerrar".</figcaption></figure>
+    <figure><img src="img/10-admin-sensores.png"><figcaption><b>10 · Gestão: sensores.</b> Limites de cada sensor, com opção de ativar ou desativar.</figcaption></figure>
+    <figure><img src="img/11-admin-abrigos.png"><figcaption><b>11 · Abrigos (ADMIN).</b> Botões + e − para atualizar a ocupação.</figcaption></figure>
+  </div>
+
+  <h3>Integração com a API</h3>
+  <ul>
+    <li><b>Cliente único:</b> todas as chamadas passam por <code>web/src/api.js</code>, que envia o token, aplica timeout de 8 s e converte os erros da API em mensagens legíveis.</li>
+    <li><b>Leitura e gravação:</b> o app lê bairros, situação, alertas, abrigos, relatos e sensores, e grava cadastro, login, relatos, status, ocupação, sensores e encerramento de alertas.</li>
+    <li><b>Erros de conexão:</b> sem rede, o app mostra o aviso "Sem conexão" e os últimos dados salvos (tela 08). Com erro 4xx ou 5xx, mostra a mensagem do servidor. Com 401, volta para o login.</li>
+  </ul>
+  <h3>Usabilidade</h3>
+  <ul>
+    <li><b>Layout:</b> mobile-first e responsivo, com navegação por abas inferiores.</li>
+    <li><b>Legibilidade:</b> fonte base de 17 px, áreas de toque de 44 a 48 px, contraste alto e modo claro e escuro automáticos.</li>
+    <li><b>Feedback:</b> toast em toda ação, spinners durante o carregamento, botões desabilitados enquanto enviam e mensagens de erro junto a cada campo.</li>
+    <li><b>Acessibilidade:</b> <code>aria-live</code>, <code>role="alert"</code>, <code>aria-invalid</code>, labels em todos os campos e respeito a <code>prefers-reduced-motion</code>.</li>
+  </ul>
+</section>
+
+<!-- ============ 5. SEGURANCA ============ -->
+<section>
+  <h2><small>Parte 5 de 6 · 2 pontos</small>Segurança</h2>
+  <table>
+    <tr><th style="width:24%">Requisito</th><th>Como foi implementado</th><th style="width:16%">Evidência</th></tr>
+    <tr><td><b>Login seguro</b></td><td>Senha guardada com hash <b>BCrypt</b> (<code>BCryptPasswordEncoder</code>), nunca em texto puro. O banco tem apenas <code>senha_hash</code>, e as respostas usam DTOs que não expõem o hash. O login devolve a mesma mensagem para email inexistente e senha errada.</td><td>CT01, CT04, script SQL</td></tr>
+    <tr><td><b>Controle de acesso</b></td><td>Token <b>JWT</b> (HMAC-SHA256, expira em 8 h) com o perfil <b>ADMIN</b> (Defesa Civil) ou <b>CIDADAO</b>. As rotas são protegidas com <code>@PreAuthorize("hasRole('ADMIN')")</code>, e o cidadão só vê e exclui os próprios relatos. No app, a aba Gestão só aparece para ADMIN.</td><td>CT05, CT06, log da API</td></tr>
+    <tr><td>Validação de entrada</td><td>Bean Validation nos DTOs (<code>@NotBlank</code>, <code>@Email</code>, <code>@Pattern</code>, <code>@Size</code>, <code>@Positive</code>) e regras no service, com resposta 400 detalhando cada campo.</td><td>CT03, CT11</td></tr>
+    <tr><td>Proteção contra SQL injection</td><td>Todo acesso passa por Spring Data JPA, com consultas derivadas e JPQL com <code>@Param</code>, sem SQL concatenado.</td><td>Repositórios</td></tr>
+    <tr><td>Proteção contra XSS</td><td>O texto livre dos relatos é salvo com HTML escapado (<code>HtmlUtils.htmlEscape</code>), e o React renderiza tudo como texto.</td><td>CT12, tela 07</td></tr>
+    <tr><td>Autenticação dos sensores</td><td>Header <code>X-Sensor-Key</code> comparado em tempo constante (<code>MessageDigest.isEqual</code>).</td><td>CT10</td></tr>
+    <tr><td>Erros sem vazamento</td><td>O <code>GlobalExceptionHandler</code> padroniza os erros e nunca devolve stack trace (<code>server.error.include-stacktrace=never</code>).</td><td>Log da API</td></tr>
+    <tr><td>Segredos e CORS</td><td>A chave JWT, as credenciais do banco e a chave dos sensores vêm de variáveis de ambiente. O CORS é restrito às origens configuradas, e a API é stateless (sem sessão).</td><td>application.properties</td></tr>
+  </table>
+</section>
+
+<!-- ============ 6. IOT ============ -->
+<section>
+  <h2><small>Parte 6 de 6 · 2 pontos</small>Simulação de IoT</h2>
+  <p>O simulador está em <code>iot/simulador.py</code> e usa apenas a biblioteca padrão do Python. Ele simula 2 sensores que enviam JSON por HTTP para a <b>API do grupo</b> (<code>POST /leituras</code>), que é o diferencial "IoT ligado à API".</p>
+  <table>
+    <tr><th style="width:18%">Sensor</th><th style="width:22%">O que mede</th><th style="width:20%">Limites</th><th>Como influencia o sistema</th></tr>
+    <tr><td><b>RIO-002</b><br>NIVEL_RIO</td><td>Nível do córrego, em metros (sensor ultrassônico instalado sob a ponte)</td><td>Atenção ≥ 2,0 m<br>Crítico ≥ 3,0 m</td><td>É o indicador direto de transbordamento: a leitura crítica dispara o alerta CRÍTICO.</td></tr>
+    <tr><td><b>CHUVA-003</b><br>PLUVIOMETRO</td><td>Intensidade da chuva, em mm/h (pluviômetro de báscula)</td><td>Atenção ≥ 30 mm/h<br>Crítico ≥ 50 mm/h</td><td>Antecipa a cheia: chuva forte gera alerta antes de o rio subir, dando tempo ao morador.</td></tr>
+  </table>
+  <pre class="claro">{"codigoSensor": "RIO-002", "valor": 3.1}     →  POST /leituras   (header X-Sensor-Key)</pre>
+
+  <h3>Uso dos dados</h3>
+  <div class="fluxo">
+    <div><b>1. Sensor</b>O simulador envia uma leitura a cada N segundos.</div><span>→</span>
+    <div><b>2. LeituraService</b>Salva a leitura e compara o valor com os limites do sensor.</div><span>→</span>
+    <div><b>3. Alerta</b>Cria ATENÇÃO ou CRÍTICO para o bairro, sem duplicar. O CRÍTICO encerra os de ATENÇÃO.</div><span>→</span>
+    <div><b>4. App</b>A tela inicial consulta <code>/bairros/{id}/situacao</code> e muda de cor.</div>
+  </div>
+  <p>O simulador tem três cenários reproduzíveis:</p>
+  <ul>
+    <li><code>normal</code>: valores baixos.</li>
+    <li><code>chuva</code>: chega até ATENÇÃO.</li>
+    <li><code>enchente</code>: sobe de forma previsível até CRÍTICO.</li>
+  </ul>
+  <p>Execução real do cenário <code>enchente</code> (as telas 03 e 04 da Parte 4 são o antes e o depois deste log):</p>
+  <pre>{{LOG_SIM}}</pre>
+</section>
+
+<!-- ============ EXECUCAO ============ -->
+<section>
+  <h2><small>Anexo</small>Como executar</h2>
+  <h3>Execução (resumo do README)</h3>
+  <table>
+    <tr><th style="width:20%">Parte</th><th>Comando</th></tr>
+    <tr><td>Banco</td><td>Executar <code>database/alerta_cheia.sql</code> no SQL Developer (F5)</td></tr>
+    <tr><td>API (Oracle)</td><td>Definir <code>DB_URL</code>, <code>DB_USER</code> e <code>DB_PASSWORD</code> e rodar <code>cd api &amp;&amp; mvn spring-boot:run</code></td></tr>
+    <tr><td>API (sem Oracle)</td><td><code>cd api &amp;&amp; mvn spring-boot:run -Dspring-boot.run.profiles=dev</code> (H2 em memória com dados de exemplo)</td></tr>
+    <tr><td>Frontend</td><td><code>cd web &amp;&amp; npm install &amp;&amp; npm run dev</code> e abrir http://localhost:5173</td></tr>
+    <tr><td>IoT</td><td><code>cd iot &amp;&amp; python simulador.py --cenario enchente --intervalo 3</code></td></tr>
+    <tr><td>Testes</td><td><code>cd api &amp;&amp; mvn test</code></td></tr>
+  </table>
+  <table>
+    <tr><th>Usuário de teste</th><th>Email</th><th>Senha</th></tr>
+    <tr><td>ADMIN (Defesa Civil)</td><td>admin@alertacheia.com</td><td>Admin@123</td></tr>
+    <tr><td>CIDADAO (Jardim Romano)</td><td>joao@email.com</td><td>Cidadao@123</td></tr>
+    <tr><td>CIDADAO (Jardim Pantanal)</td><td>maria@email.com</td><td>Cidadao@123</td></tr>
+  </table>
+</section>
+
+<script>
+  mermaid.initialize({ startOnLoad: false, theme: 'neutral', er: { useMaxWidth: true }, themeVariables: { fontSize: '13px' } })
+  mermaid.run({ querySelector: '.mermaid' }).then(() => { window.__pronto = true })
+</script>
+</body>
+</html>

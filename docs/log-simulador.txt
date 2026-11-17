@@ -1,0 +1,30 @@
+Simulando cenario 'enchente' -> http://localhost:8080 (8 ciclos)
+
+Ciclo 1: RIO-002=1.0 m | CHUVA-003=15 mm/h
+  RIO-002: situacao NORMAL
+  CHUVA-003: situacao NORMAL
+Ciclo 2: RIO-002=1.3 m | CHUVA-003=21 mm/h
+  RIO-002: situacao NORMAL
+  CHUVA-003: situacao NORMAL
+Ciclo 3: RIO-002=1.6 m | CHUVA-003=27 mm/h
+  RIO-002: situacao NORMAL
+  CHUVA-003: situacao NORMAL
+Ciclo 4: RIO-002=1.9 m | CHUVA-003=33 mm/h
+  RIO-002: situacao NORMAL
+  CHUVA-003: situacao ATENCAO
+  >>> ALERTA ATENCAO criado: Chuva em 33 mm/h no bairro Jardim Romano. Fique atento e evite areas proximas ao corrego.
+Ciclo 5: RIO-002=2.2 m | CHUVA-003=39 mm/h
+  RIO-002: situacao ATENCAO
+  CHUVA-003: situacao ATENCAO
+Ciclo 6: RIO-002=2.5 m | CHUVA-003=45 mm/h
+  RIO-002: situacao ATENCAO
+  CHUVA-003: situacao ATENCAO
+Ciclo 7: RIO-002=2.8 m | CHUVA-003=51 mm/h
+  RIO-002: situacao ATENCAO
+  CHUVA-003: situacao CRITICO
+  >>> ALERTA CRITICO criado: Chuva em 51 mm/h no bairro Jardim Romano. Risco alto de alagamento. Procure um abrigo ou local elevado.
+Ciclo 8: RIO-002=3.1 m | CHUVA-003=57 mm/h
+  RIO-002: situacao CRITICO
+  CHUVA-003: situacao CRITICO
+
+Simulacao finalizada.

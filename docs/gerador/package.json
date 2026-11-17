@@ -1,0 +1,7 @@
+{
+  "name": "alerta-cheia-gerador-pdf",
+  "private": true,
+  "type": "module",
+  "description": "Gera docs/entregaveis.pdf (capturas + PDF) usando o Google Chrome instalado",
+  "dependencies": { "puppeteer-core": "23.11.1" }
+}

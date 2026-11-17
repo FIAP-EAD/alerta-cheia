@@ -1,0 +1,11 @@
+target/
+.idea/
+*.iml
+.vscode/
+.DS_Store
+node_modules/
+__pycache__/
+dist/
+.env
+.env.pitch
+docs/pitch/*.mp4
