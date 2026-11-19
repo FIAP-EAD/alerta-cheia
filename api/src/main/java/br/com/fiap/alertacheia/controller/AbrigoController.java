@@ -51,4 +51,11 @@ public class AbrigoController {
     public void excluir(@PathVariable Long id) {
         abrigoService.excluir(id);
     }
+
+    @PatchMapping("/{id}/ocupacao")
+    @PreAuthorize("hasRole('ADMIN')")
+    public AbrigoResponse ajustarOcupacao(@PathVariable Long id,
+                                          @RequestBody @Valid AjusteOcupacaoRequest req) {
+        return abrigoService.ajustarOcupacao(id, req.delta());
+    }
 }

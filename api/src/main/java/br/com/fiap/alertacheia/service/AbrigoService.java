@@ -2,6 +2,7 @@ package br.com.fiap.alertacheia.service;
 
 import br.com.fiap.alertacheia.dto.AbrigoDtos.*;
 import br.com.fiap.alertacheia.exception.BusinessException;
+import br.com.fiap.alertacheia.exception.ConflictException;
 import br.com.fiap.alertacheia.exception.NotFoundException;
 import br.com.fiap.alertacheia.model.Abrigo;
 import br.com.fiap.alertacheia.repository.AbrigoRepository;
@@ -54,6 +55,18 @@ public class AbrigoService {
     @Transactional
     public void excluir(Long id) {
         abrigoRepository.delete(buscarEntidade(id));
+    }
+
+    @Transactional
+    public AbrigoResponse ajustarOcupacao(Long id, int delta) {
+        int linhasAfetadas = abrigoRepository.ajustarOcupacao(id, delta);
+        if (linhasAfetadas == 0) {
+            if (!abrigoRepository.existsById(id)) {
+                throw new NotFoundException("Abrigo " + id + " nao encontrado");
+            }
+            throw new ConflictException("Ocupacao fora dos limites do abrigo");
+        }
+        return AbrigoResponse.from(buscarEntidade(id));
     }
 
     private Abrigo buscarEntidade(Long id) {

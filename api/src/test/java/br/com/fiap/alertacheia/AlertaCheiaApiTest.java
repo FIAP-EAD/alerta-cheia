@@ -165,6 +165,57 @@ class AlertaCheiaApiTest {
                 .andExpect(status().isNotFound());
     }
 
+    // CT23-CT24: PATCH /abrigos/{id}/ocupacao - ajuste atomico de ocupacao
+
+    @Test
+    @DisplayName("CT23 - PATCH delta +1 em abrigo com vaga retorna 200 e ocupacao incrementada")
+    void ct23_patchOcupacao_comVaga() throws Exception {
+        // Descobrir id do abrigo com vaga (CEU Jardim Romano: 200/20)
+        String lista = mvc.perform(get("/abrigos").header("Authorization", token("joao@email.com", "Cidadao@123")))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        JsonNode abrigos = json.readTree(lista);
+        Long idComVaga = null;
+        int vagasAntes = 0;
+        for (JsonNode a : abrigos) {
+            if (a.get("vagasLivres").asInt() > 0) {
+                idComVaga = a.get("id").asLong();
+                vagasAntes = a.get("vagasOcupadas").asInt();
+                break;
+            }
+        }
+        org.junit.jupiter.api.Assertions.assertNotNull(idComVaga, "Deve existir abrigo com vaga");
+
+        mvc.perform(patch("/abrigos/" + idComVaga + "/ocupacao")
+                        .header("Authorization", token("admin@alertacheia.com", "Admin@123"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"delta\":1}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.vagasOcupadas").value(vagasAntes + 1));
+    }
+
+    @Test
+    @DisplayName("CT24 - PATCH delta +1 em abrigo lotado (Igreja Sao Jose 60/60) retorna 409")
+    void ct24_patchOcupacao_abrigoLotado() throws Exception {
+        // Descobrir id da Igreja Sao Jose (60/60 - lotado)
+        String lista = mvc.perform(get("/abrigos").header("Authorization", token("admin@alertacheia.com", "Admin@123")))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        JsonNode abrigos = json.readTree(lista);
+        Long idLotado = null;
+        for (JsonNode a : abrigos) {
+            if (a.get("nome").asText().contains("Igreja")) {
+                idLotado = a.get("id").asLong();
+                break;
+            }
+        }
+        org.junit.jupiter.api.Assertions.assertNotNull(idLotado, "Deve existir a Igreja Sao Jose");
+
+        mvc.perform(patch("/abrigos/" + idLotado + "/ocupacao")
+                        .header("Authorization", token("admin@alertacheia.com", "Admin@123"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"delta\":1}"))
+                .andExpect(status().isConflict());
+    }
+
     // CT19-CT21: encerramento automatico do alerta quando o nivel volta ao normal (histerese)
     // Setup comum: comeca com leitura critica do RIO-002 (bairro Jardim Romano)
 

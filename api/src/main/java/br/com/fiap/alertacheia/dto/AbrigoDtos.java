@@ -15,6 +15,12 @@ public final class AbrigoDtos {
             Integer vagasOcupadas,
             @NotNull(message = "Bairro e obrigatorio") Long bairroId) {}
 
+    public record AjusteOcupacaoRequest(
+            @NotNull(message = "Delta e obrigatorio")
+            @Min(value = -50, message = "Delta minimo e -50")
+            @Max(value = 50, message = "Delta maximo e 50")
+            Integer delta) {}
+
     public record AbrigoResponse(Long id, String nome, String endereco, int capacidade, int vagasOcupadas,
                                  int vagasLivres, Long bairroId, String bairroNome) {
         public static AbrigoResponse from(Abrigo a) {
