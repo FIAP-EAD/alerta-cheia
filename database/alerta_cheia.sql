@@ -122,6 +122,12 @@ CREATE TABLE TB_RELATO (
 CREATE INDEX ix_leitura_sensor_data ON TB_LEITURA (id_sensor, data_hora);
 CREATE INDEX ix_alerta_bairro_status ON TB_ALERTA (id_bairro, status);
 
+-- Rede de seguranca contra alertas duplicados: apenas 1 alerta ATIVO por (bairro, severidade)
+CREATE UNIQUE INDEX ux_alerta_ativo ON TB_ALERTA (
+  CASE WHEN status = 'ATIVO' THEN id_bairro END,
+  CASE WHEN status = 'ATIVO' THEN severidade END
+);
+
 -- ---------------------------------------------------------------------
 -- 2) CARGA INICIAL
 -- Senhas (hash BCrypt): admin@alertacheia.com -> Admin@123

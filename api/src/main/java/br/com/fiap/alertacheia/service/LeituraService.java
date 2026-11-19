@@ -7,6 +7,7 @@ import br.com.fiap.alertacheia.exception.NotFoundException;
 import br.com.fiap.alertacheia.exception.UnauthorizedException;
 import br.com.fiap.alertacheia.model.*;
 import br.com.fiap.alertacheia.repository.AlertaRepository;
+import br.com.fiap.alertacheia.repository.BairroRepository;
 import br.com.fiap.alertacheia.repository.LeituraRepository;
 import br.com.fiap.alertacheia.repository.SensorRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,13 +35,16 @@ public class LeituraService {
     private final LeituraRepository leituraRepository;
     private final SensorRepository sensorRepository;
     private final AlertaRepository alertaRepository;
+    private final BairroRepository bairroRepository;
     private final byte[] chaveSensores;
 
     public LeituraService(LeituraRepository leituraRepository, SensorRepository sensorRepository,
-                          AlertaRepository alertaRepository, @Value("${app.sensor.api-key}") String chaveSensores) {
+                          AlertaRepository alertaRepository, BairroRepository bairroRepository,
+                          @Value("${app.sensor.api-key}") String chaveSensores) {
         this.leituraRepository = leituraRepository;
         this.sensorRepository = sensorRepository;
         this.alertaRepository = alertaRepository;
+        this.bairroRepository = bairroRepository;
         this.chaveSensores = chaveSensores.getBytes(StandardCharsets.UTF_8);
     }
 
@@ -83,7 +87,8 @@ public class LeituraService {
     }
 
     private Alerta gerarAlertaSeNecessario(Sensor sensor, Leitura leitura, Severidade severidade) {
-        Bairro bairro = sensor.getBairro();
+        Bairro bairro = bairroRepository.travarPorId(sensor.getBairro().getId())
+                .orElseThrow(() -> new NotFoundException("Bairro nao encontrado"));
         Set<Severidade> igualOuMaior = severidade == Severidade.CRITICO
                 ? Set.of(Severidade.CRITICO) : Set.of(Severidade.ATENCAO, Severidade.CRITICO);
         if (alertaRepository.existsByBairroIdAndStatusAndSeveridadeIn(bairro.getId(), StatusAlerta.ATIVO, igualOuMaior)) {
