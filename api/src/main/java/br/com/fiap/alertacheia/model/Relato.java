@@ -19,7 +19,7 @@ public class Relato {
     @JoinColumn(name = "id_bairro", nullable = false)
     private Bairro bairro;
 
-    @Column(nullable = false, length = 500)
+    @Column(nullable = false, length = 1000)
     private String descricao;
 
     @Enumerated(EnumType.STRING)

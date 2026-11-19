@@ -216,6 +216,31 @@ class AlertaCheiaApiTest {
                 .andExpect(status().isConflict());
     }
 
+    // CT25-CT26: relatos com acentos e apostrofos nao estouram a coluna
+
+    @Test
+    @DisplayName("CT25 - Relato com ~480 caracteres acentuados e apostrofos retorna 201")
+    void ct25_relatoAcentosEApostrofos_aceito() throws Exception {
+        // ~480 chars com acentos e apostrofos: cada acento ocupa 2 bytes em UTF-8, mas a coluna e CHAR
+        String base = "Água subiu e está invadindo a rua d'água na região. ";
+        String descricao = base.repeat(10).substring(0, 480);
+        mvc.perform(post("/relatos").header("Authorization", token("maria@email.com", "Cidadao@123"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"bairroId\":1,\"descricao\":\"%s\"}".formatted(descricao.replace("\"", "\\\""))))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    @DisplayName("CT26 - Relato com 500 apostrofos retorna 400 (nao 409) por tamanho apos escape")
+    void ct26_relato500Apostrofos_retorna400() throws Exception {
+        // 500 apostrofos -> cada vira &#39; (5 chars) -> 2500 chars apos escape -> > 1000 -> BusinessException -> 400
+        String descricao = "'".repeat(500);
+        mvc.perform(post("/relatos").header("Authorization", token("maria@email.com", "Cidadao@123"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"bairroId\":1,\"descricao\":\"%s\"}".formatted(descricao)))
+                .andExpect(status().isBadRequest());
+    }
+
     // CT19-CT21: encerramento automatico do alerta quando o nivel volta ao normal (histerese)
     // Setup comum: comeca com leitura critica do RIO-002 (bairro Jardim Romano)
 
