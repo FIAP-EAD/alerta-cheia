@@ -4,6 +4,7 @@ import br.com.fiap.alertacheia.dto.LeituraDtos.LeituraRequest;
 import br.com.fiap.alertacheia.model.Severidade;
 import br.com.fiap.alertacheia.model.StatusAlerta;
 import br.com.fiap.alertacheia.repository.AlertaRepository;
+import br.com.fiap.alertacheia.repository.LeituraRepository;
 import br.com.fiap.alertacheia.repository.SensorRepository;
 import br.com.fiap.alertacheia.service.LeituraService;
 import org.junit.jupiter.api.DisplayName;
@@ -20,6 +21,7 @@ import java.math.BigDecimal;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -35,15 +37,17 @@ class LeituraConcorrenciaTest {
     @Autowired LeituraService leituraService;
     @Autowired AlertaRepository alertaRepository;
     @Autowired SensorRepository sensorRepository;
+    @Autowired LeituraRepository leituraRepository;
     @Autowired PlatformTransactionManager txManager;
     @Value("${app.sensor.api-key}") String chave;
 
     @Test
-    @DisplayName("CT - 8 threads criticas do RIO-001 geram exatamente 1 alerta CRITICO ATIVO")
-    void concorrencia_semAlertaDuplicado() throws InterruptedException {
+    @DisplayName("CT22 - 8 threads criticas do RIO-001 geram exatamente 1 alerta CRITICO ATIVO e 0 excecoes")
+    void ct22_concorrencia_semAlertaDuplicado() throws InterruptedException {
         int threads = 8;
         CountDownLatch pronto = new CountDownLatch(1);
         CountDownLatch fim = new CountDownLatch(threads);
+        AtomicInteger erros = new AtomicInteger(0);
 
         ExecutorService pool = Executors.newFixedThreadPool(threads);
         for (int i = 0; i < threads; i++) {
@@ -51,7 +55,8 @@ class LeituraConcorrenciaTest {
                 try {
                     pronto.await();
                     leituraService.registrar(chave, new LeituraRequest("RIO-001", new BigDecimal("3.50")));
-                } catch (Exception ignored) {
+                } catch (Exception e) {
+                    erros.incrementAndGet();
                 } finally {
                     fim.countDown();
                 }
@@ -62,11 +67,17 @@ class LeituraConcorrenciaTest {
         fim.await();
         pool.shutdown();
 
-        // Asserção dentro de uma transação para evitar LazyInitializationException
+        assertEquals(0, erros.get(), "Nenhuma thread deve ter lancado excecao");
+
         new TransactionTemplate(txManager).execute(status -> {
             Long bairroId = sensorRepository.findByCodigo("RIO-001")
                     .map(s -> s.getBairro().getId())
                     .orElseThrow();
+
+            long leiturasSalvas = leituraRepository.findTop50BySensorIdOrderByDataHoraDesc(
+                    sensorRepository.findByCodigo("RIO-001").orElseThrow().getId()).size();
+            assertEquals(threads, leiturasSalvas, "Todas as 8 leituras devem ter sido salvas");
+
             long ativos = alertaRepository.findByBairroIdAndStatus(bairroId, StatusAlerta.ATIVO)
                     .stream()
                     .filter(a -> a.getSeveridade() == Severidade.CRITICO)

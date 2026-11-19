@@ -29,6 +29,8 @@ def gerar_valores(cenario, ciclo):
         return round(random.uniform(0.8, 1.4), 2), round(random.uniform(0, 12), 1)
     if cenario == "chuva":  # chuva forte, rio sobe ate a faixa de ATENCAO
         return round(min(1.2 + 0.15 * ciclo, 2.6), 2), round(min(20 + 4 * ciclo, 45), 1)
+    if cenario == "recuo":  # rio descendo de 3.2 m em passos de 0.4 ate 0.9 (demonstra encerramento automatico)
+        return round(max(3.2 - 0.4 * ciclo, 0.9), 2), round(max(40 - 4 * ciclo, 5), 1)
     # enchente: sobe de forma previsivel ate passar do limite critico (bom para o video)
     return round(1.0 + 0.3 * ciclo, 2), round(min(15 + 6 * ciclo, 75), 1)
 
@@ -49,7 +51,7 @@ def enviar(url, chave, codigo, valor):
 
 def main():
     p = argparse.ArgumentParser(description="Simulador de sensores do Alerta Cheia")
-    p.add_argument("--cenario", choices=["normal", "chuva", "enchente"], default="normal")
+    p.add_argument("--cenario", choices=["normal", "chuva", "enchente", "recuo"], default="normal")
     p.add_argument("--url", default="http://localhost:8080")
     p.add_argument("--chave", default="sensor-dev-key-123", help="valor do header X-Sensor-Key")
     p.add_argument("--intervalo", type=float, default=5, help="segundos entre envios")

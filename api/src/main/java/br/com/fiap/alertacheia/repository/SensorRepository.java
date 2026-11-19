@@ -9,4 +9,5 @@ public interface SensorRepository extends JpaRepository<Sensor, Long> {
     Optional<Sensor> findByCodigo(String codigo);
     boolean existsByCodigo(String codigo);
     List<Sensor> findByBairroId(Long bairroId);
+    List<Sensor> findByBairroIdAndAtivoTrue(Long bairroId);
 }

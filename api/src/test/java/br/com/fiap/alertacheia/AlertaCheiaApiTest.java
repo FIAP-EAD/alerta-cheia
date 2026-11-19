@@ -164,4 +164,51 @@ class AlertaCheiaApiTest {
         mvc.perform(get("/abrigos/9999").header("Authorization", token("maria@email.com", "Cidadao@123")))
                 .andExpect(status().isNotFound());
     }
+
+    // CT19-CT21: encerramento automatico do alerta quando o nivel volta ao normal (histerese)
+    // Setup comum: comeca com leitura critica do RIO-002 (bairro Jardim Romano)
+
+    @Test
+    @DisplayName("CT19 - 3 leituras normais estáveis/descendo encerram alerta automaticamente")
+    void ct19_encerramentoAutomatico_normalizado() throws Exception {
+        enviarLeitura("RIO-002", "3.50"); // gera CRITICO
+
+        // 3 leituras descendo: 1.0, 1.0, 0.9 (todas < 90% de 2.0 = 1.8 e a mais recente <= a mais antiga)
+        enviarLeitura("RIO-002", "1.0");
+        enviarLeitura("RIO-002", "1.0");
+        enviarLeitura("RIO-002", "0.9");
+
+        mvc.perform(get("/bairros/2/situacao").header("Authorization", token("joao@email.com", "Cidadao@123")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.situacao").value("NORMAL"));
+    }
+
+    @Test
+    @DisplayName("CT20 - Leituras subindo (1.0 > 1.5 > 1.7) mantém alerta CRITICO")
+    void ct20_semEncerramento_subindo() throws Exception {
+        enviarLeitura("RIO-002", "3.50"); // gera CRITICO
+
+        // Subindo: mais recente (1.7) > mais antiga (1.0) → nao normalizado
+        enviarLeitura("RIO-002", "1.0");
+        enviarLeitura("RIO-002", "1.5");
+        enviarLeitura("RIO-002", "1.7");
+
+        mvc.perform(get("/bairros/2/situacao").header("Authorization", token("joao@email.com", "Cidadao@123")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.situacao").value("CRITICO"));
+    }
+
+    @Test
+    @DisplayName("CT21 - Apenas 2 leituras normais não encerram (leitura critica ainda aparece no top-3)")
+    void ct21_semEncerramento_apenasduasNormais() throws Exception {
+        enviarLeitura("RIO-002", "3.50"); // gera CRITICO
+
+        // Apenas 2 normais: top-3 = [1.0, 1.0, 3.50] → 3.50 >= 1.8 → nao normalizado
+        enviarLeitura("RIO-002", "1.0");
+        enviarLeitura("RIO-002", "1.0");
+
+        mvc.perform(get("/bairros/2/situacao").header("Authorization", token("joao@email.com", "Cidadao@123")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.situacao").value("CRITICO"));
+    }
 }
