@@ -161,7 +161,7 @@ VALUES (1, 1, 2, 'ATENCAO', 'Nivel do rio em 2.40 m no Jardim Pantanal. Fique at
 INSERT INTO TB_ALERTA (id, id_bairro, id_leitura, severidade, mensagem, status, criado_em)
 VALUES (2, 1, 3, 'CRITICO', 'Nivel do rio em 3.10 m no Jardim Pantanal. Procure um abrigo.', 'ATIVO', SYSTIMESTAMP - INTERVAL '1' HOUR);
 INSERT INTO TB_ALERTA (id, id_bairro, id_leitura, severidade, mensagem, status, criado_em)
-VALUES (3, 1, 5, 'ATENCAO', 'Chuva de 45.50 mm/h no Jardim Pantanal.', 'ATIVO', SYSTIMESTAMP - INTERVAL '2' HOUR);
+VALUES (3, 1, 5, 'ATENCAO', 'Chuva de 45.50 mm/h no Jardim Pantanal.', 'ENCERRADO', SYSTIMESTAMP - INTERVAL '2' HOUR);
 
 INSERT INTO TB_ABRIGO (id, nome, endereco, capacidade, vagas_ocupadas, id_bairro) VALUES (1, 'EMEF Jardim Pantanal',  'Rua A, 100',     120, 45, 1);
 INSERT INTO TB_ABRIGO (id, nome, endereco, capacidade, vagas_ocupadas, id_bairro) VALUES (2, 'Igreja Sao Jose',       'Rua B, 250',      60, 60, 1);
