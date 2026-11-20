@@ -12,13 +12,9 @@ function AjusteVagas({ abrigo, onSalvo }) {
   const toast = useToast()
   const [salvando, setSalvando] = useState(false)
   async function ajustar(delta) {
-    const vagasOcupadas = abrigo.vagasOcupadas + delta
-    if (vagasOcupadas < 0 || vagasOcupadas > abrigo.capacidade) return
     setSalvando(true)
     try {
-      await api.put(`/abrigos/${abrigo.id}`, {
-        nome: abrigo.nome, endereco: abrigo.endereco, capacidade: abrigo.capacidade, vagasOcupadas, bairroId: abrigo.bairroId,
-      })
+      await api.patch(`/abrigos/${abrigo.id}/ocupacao`, { delta })
       onSalvo()
     } catch (e) {
       toast(e.message, 'erro')

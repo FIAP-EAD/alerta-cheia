@@ -1,4 +1,5 @@
-Simulando cenario 'enchente' -> http://localhost:8080 (8 ciclos)
+=== CENARIO: enchente ===
+Simulando cenario 'enchente' -> http://localhost:8080 (10 ciclos)
 
 Ciclo 1: RIO-002=1.0 m | CHUVA-003=15 mm/h
   RIO-002: situacao NORMAL
@@ -26,5 +27,48 @@ Ciclo 7: RIO-002=2.8 m | CHUVA-003=51 mm/h
 Ciclo 8: RIO-002=3.1 m | CHUVA-003=57 mm/h
   RIO-002: situacao CRITICO
   CHUVA-003: situacao CRITICO
+Ciclo 9: RIO-002=3.4 m | CHUVA-003=63 mm/h
+  RIO-002: situacao CRITICO
+  CHUVA-003: situacao CRITICO
+Ciclo 10: RIO-002=3.7 m | CHUVA-003=69 mm/h
+  RIO-002: situacao CRITICO
+  CHUVA-003: situacao CRITICO
 
 Simulacao finalizada.
+
+=== CENARIO: recuo ===
+Simulando cenario 'recuo' -> http://localhost:8080 (9 ciclos)
+
+Ciclo 1: RIO-002=3.2 m | CHUVA-003=40 mm/h
+  RIO-002: situacao CRITICO
+  CHUVA-003: situacao ATENCAO
+Ciclo 2: RIO-002=2.8 m | CHUVA-003=36 mm/h
+  RIO-002: situacao ATENCAO
+  CHUVA-003: situacao ATENCAO
+Ciclo 3: RIO-002=2.4 m | CHUVA-003=32 mm/h
+  RIO-002: situacao ATENCAO
+  CHUVA-003: situacao ATENCAO
+Ciclo 4: RIO-002=2.0 m | CHUVA-003=28 mm/h
+  RIO-002: situacao ATENCAO
+  CHUVA-003: situacao NORMAL
+Ciclo 5: RIO-002=1.6 m | CHUVA-003=24 mm/h
+  RIO-002: situacao NORMAL
+  CHUVA-003: situacao NORMAL
+Ciclo 6: RIO-002=1.2 m | CHUVA-003=20 mm/h
+  RIO-002: situacao NORMAL
+  CHUVA-003: situacao NORMAL
+Ciclo 7: RIO-002=0.9 m | CHUVA-003=16 mm/h
+  RIO-002: situacao NORMAL
+  CHUVA-003: situacao NORMAL
+Ciclo 8: RIO-002=0.9 m | CHUVA-003=12 mm/h
+  RIO-002: situacao NORMAL
+  CHUVA-003: situacao NORMAL
+Ciclo 9: RIO-002=0.9 m | CHUVA-003=8 mm/h
+  RIO-002: situacao NORMAL
+  CHUVA-003: situacao NORMAL
+
+Simulacao finalizada.
+
+--- VERIFICACAO DO ENCERRAMENTO AUTOMATICO ---
+GET /bairros/2/situacao (joao@email.com / Cidadao@123) -> situacao: NORMAL
+Confirmado: apos o recuo, o motor de histerese encerrou todos os alertas ativos do Jardim Romano.

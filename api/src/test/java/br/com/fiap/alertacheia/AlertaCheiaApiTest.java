@@ -164,4 +164,127 @@ class AlertaCheiaApiTest {
         mvc.perform(get("/abrigos/9999").header("Authorization", token("maria@email.com", "Cidadao@123")))
                 .andExpect(status().isNotFound());
     }
+
+    // CT23-CT24: PATCH /abrigos/{id}/ocupacao - ajuste atomico de ocupacao
+
+    @Test
+    @DisplayName("CT23 - PATCH delta +1 em abrigo com vaga retorna 200 e ocupacao incrementada")
+    void ct23_patchOcupacao_comVaga() throws Exception {
+        // Descobrir id do abrigo com vaga (CEU Jardim Romano: 200/20)
+        String lista = mvc.perform(get("/abrigos").header("Authorization", token("joao@email.com", "Cidadao@123")))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        JsonNode abrigos = json.readTree(lista);
+        Long idComVaga = null;
+        int vagasAntes = 0;
+        for (JsonNode a : abrigos) {
+            if (a.get("vagasLivres").asInt() > 0) {
+                idComVaga = a.get("id").asLong();
+                vagasAntes = a.get("vagasOcupadas").asInt();
+                break;
+            }
+        }
+        org.junit.jupiter.api.Assertions.assertNotNull(idComVaga, "Deve existir abrigo com vaga");
+
+        mvc.perform(patch("/abrigos/" + idComVaga + "/ocupacao")
+                        .header("Authorization", token("admin@alertacheia.com", "Admin@123"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"delta\":1}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.vagasOcupadas").value(vagasAntes + 1));
+    }
+
+    @Test
+    @DisplayName("CT24 - PATCH delta +1 em abrigo lotado (Igreja Sao Jose 60/60) retorna 409")
+    void ct24_patchOcupacao_abrigoLotado() throws Exception {
+        // Descobrir id da Igreja Sao Jose (60/60 - lotado)
+        String lista = mvc.perform(get("/abrigos").header("Authorization", token("admin@alertacheia.com", "Admin@123")))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        JsonNode abrigos = json.readTree(lista);
+        Long idLotado = null;
+        for (JsonNode a : abrigos) {
+            if (a.get("nome").asText().contains("Igreja")) {
+                idLotado = a.get("id").asLong();
+                break;
+            }
+        }
+        org.junit.jupiter.api.Assertions.assertNotNull(idLotado, "Deve existir a Igreja Sao Jose");
+
+        mvc.perform(patch("/abrigos/" + idLotado + "/ocupacao")
+                        .header("Authorization", token("admin@alertacheia.com", "Admin@123"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"delta\":1}"))
+                .andExpect(status().isConflict());
+    }
+
+    // CT25-CT26: relatos com acentos e apostrofos nao estouram a coluna
+
+    @Test
+    @DisplayName("CT25 - Relato com ~480 caracteres acentuados e apostrofos retorna 201")
+    void ct25_relatoAcentosEApostrofos_aceito() throws Exception {
+        // ~480 chars com acentos e apostrofos: cada acento ocupa 2 bytes em UTF-8, mas a coluna e CHAR
+        String base = "Água subiu e está invadindo a rua d'água na região. ";
+        String descricao = base.repeat(10).substring(0, 480);
+        mvc.perform(post("/relatos").header("Authorization", token("maria@email.com", "Cidadao@123"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"bairroId\":1,\"descricao\":\"%s\"}".formatted(descricao.replace("\"", "\\\""))))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    @DisplayName("CT26 - Relato com 500 apostrofos retorna 400 (nao 409) por tamanho apos escape")
+    void ct26_relato500Apostrofos_retorna400() throws Exception {
+        // 500 apostrofos -> cada vira &#39; (5 chars) -> 2500 chars apos escape -> > 1000 -> BusinessException -> 400
+        String descricao = "'".repeat(500);
+        mvc.perform(post("/relatos").header("Authorization", token("maria@email.com", "Cidadao@123"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"bairroId\":1,\"descricao\":\"%s\"}".formatted(descricao)))
+                .andExpect(status().isBadRequest());
+    }
+
+    // CT19-CT21: encerramento automatico do alerta quando o nivel volta ao normal (histerese)
+    // Setup comum: comeca com leitura critica do RIO-002 (bairro Jardim Romano)
+
+    @Test
+    @DisplayName("CT19 - 3 leituras normais estáveis/descendo encerram alerta automaticamente")
+    void ct19_encerramentoAutomatico_normalizado() throws Exception {
+        enviarLeitura("RIO-002", "3.50"); // gera CRITICO
+
+        // 3 leituras descendo: 1.0, 1.0, 0.9 (todas < 90% de 2.0 = 1.8 e a mais recente <= a mais antiga)
+        enviarLeitura("RIO-002", "1.0");
+        enviarLeitura("RIO-002", "1.0");
+        enviarLeitura("RIO-002", "0.9");
+
+        mvc.perform(get("/bairros/2/situacao").header("Authorization", token("joao@email.com", "Cidadao@123")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.situacao").value("NORMAL"));
+    }
+
+    @Test
+    @DisplayName("CT20 - Leituras subindo (1.0 > 1.5 > 1.7) mantém alerta CRITICO")
+    void ct20_semEncerramento_subindo() throws Exception {
+        enviarLeitura("RIO-002", "3.50"); // gera CRITICO
+
+        // Subindo: mais recente (1.7) > mais antiga (1.0) → nao normalizado
+        enviarLeitura("RIO-002", "1.0");
+        enviarLeitura("RIO-002", "1.5");
+        enviarLeitura("RIO-002", "1.7");
+
+        mvc.perform(get("/bairros/2/situacao").header("Authorization", token("joao@email.com", "Cidadao@123")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.situacao").value("CRITICO"));
+    }
+
+    @Test
+    @DisplayName("CT21 - Apenas 2 leituras normais não encerram (leitura critica ainda aparece no top-3)")
+    void ct21_semEncerramento_apenasduasNormais() throws Exception {
+        enviarLeitura("RIO-002", "3.50"); // gera CRITICO
+
+        // Apenas 2 normais: top-3 = [1.0, 1.0, 3.50] → 3.50 >= 1.8 → nao normalizado
+        enviarLeitura("RIO-002", "1.0");
+        enviarLeitura("RIO-002", "1.0");
+
+        mvc.perform(get("/bairros/2/situacao").header("Authorization", token("joao@email.com", "Cidadao@123")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.situacao").value("CRITICO"));
+    }
 }

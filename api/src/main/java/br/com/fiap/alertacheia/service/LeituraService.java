@@ -7,6 +7,7 @@ import br.com.fiap.alertacheia.exception.NotFoundException;
 import br.com.fiap.alertacheia.exception.UnauthorizedException;
 import br.com.fiap.alertacheia.model.*;
 import br.com.fiap.alertacheia.repository.AlertaRepository;
+import br.com.fiap.alertacheia.repository.BairroRepository;
 import br.com.fiap.alertacheia.repository.LeituraRepository;
 import br.com.fiap.alertacheia.repository.SensorRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,13 +35,16 @@ public class LeituraService {
     private final LeituraRepository leituraRepository;
     private final SensorRepository sensorRepository;
     private final AlertaRepository alertaRepository;
+    private final BairroRepository bairroRepository;
     private final byte[] chaveSensores;
 
     public LeituraService(LeituraRepository leituraRepository, SensorRepository sensorRepository,
-                          AlertaRepository alertaRepository, @Value("${app.sensor.api-key}") String chaveSensores) {
+                          AlertaRepository alertaRepository, BairroRepository bairroRepository,
+                          @Value("${app.sensor.api-key}") String chaveSensores) {
         this.leituraRepository = leituraRepository;
         this.sensorRepository = sensorRepository;
         this.alertaRepository = alertaRepository;
+        this.bairroRepository = bairroRepository;
         this.chaveSensores = chaveSensores.getBytes(StandardCharsets.UTF_8);
     }
 
@@ -56,7 +60,12 @@ public class LeituraService {
 
         Leitura leitura = leituraRepository.save(new Leitura(sensor, req.valor()));
         Severidade severidade = classificar(sensor, req.valor());
-        Alerta alerta = severidade == null ? null : gerarAlertaSeNecessario(sensor, leitura, severidade);
+        Alerta alerta = null;
+        if (severidade == null) {
+            encerrarSeNormalizado(sensor);
+        } else {
+            alerta = gerarAlertaSeNecessario(sensor, leitura, severidade);
+        }
 
         String situacao = severidade == null ? "NORMAL" : severidade.name();
         return LeituraResponse.from(leitura, situacao, alerta == null ? null : AlertaResponse.from(alerta));
@@ -83,7 +92,8 @@ public class LeituraService {
     }
 
     private Alerta gerarAlertaSeNecessario(Sensor sensor, Leitura leitura, Severidade severidade) {
-        Bairro bairro = sensor.getBairro();
+        Bairro bairro = bairroRepository.travarPorId(sensor.getBairro().getId())
+                .orElseThrow(() -> new NotFoundException("Bairro nao encontrado"));
         Set<Severidade> igualOuMaior = severidade == Severidade.CRITICO
                 ? Set.of(Severidade.CRITICO) : Set.of(Severidade.ATENCAO, Severidade.CRITICO);
         if (alertaRepository.existsByBairroIdAndStatusAndSeveridadeIn(bairro.getId(), StatusAlerta.ATIVO, igualOuMaior)) {
@@ -94,6 +104,31 @@ public class LeituraService {
                     .forEach(a -> a.setStatus(StatusAlerta.ENCERRADO));
         }
         return alertaRepository.save(new Alerta(bairro, leitura, severidade, montarMensagem(sensor, leitura, severidade)));
+    }
+
+    private void encerrarSeNormalizado(Sensor sensor) {
+        Bairro bairro = bairroRepository.travarPorId(sensor.getBairro().getId())
+                .orElseThrow(() -> new NotFoundException("Bairro nao encontrado"));
+        List<Alerta> ativos = alertaRepository.findByBairroIdAndStatus(bairro.getId(), StatusAlerta.ATIVO);
+        if (ativos.isEmpty()) return;
+
+        List<Sensor> sensoresAtivos = sensorRepository.findByBairroIdAndAtivoTrue(bairro.getId());
+        for (Sensor s : sensoresAtivos) {
+            List<Leitura> ultimas3 = leituraRepository.findTop3BySensorIdOrderByDataHoraDescIdDesc(s.getId());
+            if (ultimas3.isEmpty()) continue;
+
+            BigDecimal threshold90 = s.getLimiteAlerta().multiply(new BigDecimal("0.9"));
+            boolean allBelowThreshold = ultimas3.stream()
+                    .allMatch(l -> l.getValor().compareTo(threshold90) < 0);
+            if (!allBelowThreshold) return;
+
+            // mais recente e o primeiro (desc), mais antiga e o ultimo
+            BigDecimal maisRecente = ultimas3.get(0).getValor();
+            BigDecimal maisAntiga = ultimas3.get(ultimas3.size() - 1).getValor();
+            if (maisRecente.compareTo(maisAntiga) > 0) return; // subindo, nao normalizado
+        }
+
+        ativos.forEach(a -> a.setStatus(StatusAlerta.ENCERRADO));
     }
 
     private String montarMensagem(Sensor sensor, Leitura leitura, Severidade severidade) {

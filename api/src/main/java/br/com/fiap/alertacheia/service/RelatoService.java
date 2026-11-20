@@ -1,6 +1,7 @@
 package br.com.fiap.alertacheia.service;
 
 import br.com.fiap.alertacheia.dto.RelatoDtos.*;
+import br.com.fiap.alertacheia.exception.BusinessException;
 import br.com.fiap.alertacheia.exception.ForbiddenException;
 import br.com.fiap.alertacheia.exception.NotFoundException;
 import br.com.fiap.alertacheia.model.Relato;
@@ -33,6 +34,9 @@ public class RelatoService {
                 .orElseThrow(() -> new NotFoundException("Usuario nao encontrado"));
         // Protecao contra XSS: texto livre e salvo com HTML escapado (<script> vira &lt;script&gt;)
         String descricao = HtmlUtils.htmlEscape(req.descricao().trim(), "UTF-8");
+        if (descricao.length() > 1000) {
+            throw new BusinessException("Descricao muito longa");
+        }
         Relato relato = new Relato(usuario, bairroService.buscarEntidade(req.bairroId()), descricao);
         return RelatoResponse.from(relatoRepository.save(relato));
     }

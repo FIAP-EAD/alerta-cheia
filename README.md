@@ -8,15 +8,15 @@ os abrigos com vaga, e pode enviar relatos do que está acontecendo no bairro.
 
 **ODS:** 11 (cidades sustentáveis), 13 (ação climática) e 10 (redução das desigualdades).
 
-🎥 **Vídeo pitch:** `<COLE AQUI O LINK PÚBLICO>`
+🎥 **Vídeo pitch:** https://youtu.be/lmJi1HKYacs
 
 ## Integrantes
 
 | Nome | RM |
 |---|---|
-| Lucas | RM554589 |
+| Lucas Ludovico | RM554589 |
 | Yuri Lopes | RM555522 |
-| Thiago | RM555485 |
+| Thiago Oliveira | RM555485 |
 
 ---
 
@@ -96,6 +96,7 @@ Estão na carga inicial e também no perfil `dev`.
 | PUT | `/alertas/{id}/encerrar` | ADMIN |
 | GET | `/abrigos?bairroId=&somenteComVaga=` | logado |
 | POST, PUT, DELETE | `/abrigos` | ADMIN |
+| PATCH | `/abrigos/{id}/ocupacao` | ADMIN |
 | POST | `/relatos` | logado |
 | GET | `/relatos` | logado (cidadão vê só os próprios relatos) |
 | PUT | `/relatos/{id}/status` | ADMIN |
@@ -131,8 +132,9 @@ python simulador.py --cenario enchente --intervalo 3
 | `CHUVA-003` (PLUVIOMETRO) | intensidade da chuva, em mm/h | ≥ 30 | ≥ 50 |
 
 **Como os dados influenciam o sistema:** cada leitura é enviada por `POST /leituras`. O `LeituraService` compara o valor com os limites do sensor e cria um alerta `ATENCAO` ou `CRITICO` para o bairro.
-- Não cria alerta duplicado enquanto já existe um alerta igual ou mais grave ativo.
+- Não cria alerta duplicado enquanto já existe um alerta igual ou mais grave ativo (garantido por lock pessimista no bairro).
 - Um alerta CRITICO encerra os alertas de ATENÇÃO do bairro.
+- **Encerramento automático (histerese):** quando a leitura é NORMAL, o sistema verifica se todos os sensores ativos do bairro têm as últimas 3 leituras abaixo de 90 % do limite de alerta e estáveis ou descendo. Se sim, todos os alertas ativos do bairro são encerrados automaticamente.
 
 O app consulta `GET /bairros/{id}/situacao` e muda a cor do card para NORMAL, ATENÇÃO ou CRÍTICO.
 
@@ -140,6 +142,7 @@ O app consulta `GET /bairros/{id}/situacao` e muda a cor do card para NORMAL, AT
 - `normal`: valores baixos.
 - `chuva`: chega até ATENÇÃO.
 - `enchente`: sobe de forma previsível até CRÍTICO. É o ideal para o vídeo.
+- `recuo`: o rio desce de 3,2 m em passos de 0,4 m até 0,9 m (chuva cai de 40 para 5 mm/h). Demonstra o encerramento automático ao vivo.
 
 ## 4. Frontend web mobile-first (React)
 
@@ -183,7 +186,7 @@ cd api
 mvn test
 ```
 
-São 16 testes: 13 de API com MockMvc e H2, mais 3 de unidade da regra de classificação. O relatório fica em `api/target/surefire-reports/`.
+São **24 testes** automatizados: 20 de API com MockMvc + H2 (`AlertaCheiaApiTest`: CT01–CT13, CT19–CT21 e CT23–CT26), 1 de concorrência (`LeituraConcorrenciaTest`: CT22, sem `@Transactional`) e 3 de unidade da regra de classificação (`LeituraServiceTest`). O relatório fica em `api/target/surefire-reports/`.
 
 ## 6. Segurança
 
@@ -194,4 +197,12 @@ São 16 testes: 13 de API com MockMvc e H2, mais 3 de unidade da regra de classi
 - **XSS:** texto livre dos relatos é salvo com HTML escapado.
 - **Sensores:** autenticados por chave (`X-Sensor-Key`), comparada em tempo constante.
 - **Erros:** respostas padronizadas, sem stack trace. O login devolve a mesma mensagem para email e senha errados.
-- **CORS:** restrito por configuração. Segredos (JWT, banco, chave dos sensores) vêm de variáveis de ambiente.
+- **Timing attack:** quando o e-mail não existe, o BCrypt ainda roda com um hash fixo gerado na inicialização, nivelando o tempo de resposta e impedindo enumeração de e-mails por diferença de latência.
+- **Race condition:** lock pessimista no bairro (`PESSIMISTIC_WRITE`) e índice único condicional no Oracle impedem que leituras concorrentes gerem alertas duplicados.
+- **CORS:** restrito por configuração, incluindo o método `PATCH`. Segredos (JWT, banco, chave dos sensores) vêm de variáveis de ambiente.
+
+## 7. Uso de IA generativa
+
+| Ferramenta | Como foi usada |
+|---|---|
+| **Claude (Anthropic)** | Análise do projeto, sugestões de melhorias de segurança e correção de bugs (timing attack, race condition, encerramento automático, PATCH atômico, semântica CHAR), e implementação das mudanças deste PR. Todas as sugestões e o código gerado foram revisados e validados pelo grupo antes de incorporar. |

@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface LeituraRepository extends JpaRepository<Leitura, Long> {
     List<Leitura> findTop50BySensorIdOrderByDataHoraDesc(Long sensorId);
+    List<Leitura> findTop3BySensorIdOrderByDataHoraDescIdDesc(Long sensorId);
 }
