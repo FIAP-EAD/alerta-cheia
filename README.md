@@ -14,7 +14,7 @@ os abrigos com vaga, e pode enviar relatos do que está acontecendo no bairro.
 
 | Nome | RM |
 |---|---|
-| Lucas | RM554589 |
+| Lucas Ludovico | RM554589 |
 | Yuri Lopes | RM555522 |
 | Thiago Oliveira | RM555485 |
 

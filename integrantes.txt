@@ -2,7 +2,7 @@ Grupo: Alerta Cheia
 Turma: 3ESOA
 
 Integrantes:
-RM554589 - Lucas
+RM554589 - Lucas Ludovico
 RM555522 - Yuri Lopes
 RM555485 - Thiago Oliveira
 
