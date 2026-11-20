@@ -81,7 +81,7 @@
       <tr><th>Nome</th><th>RM</th></tr>
       <tr><td>Lucas</td><td>RM554589</td></tr>
       <tr><td>Yuri Lopes</td><td>RM555522</td></tr>
-      <tr><td>Thiago</td><td>RM555485</td></tr>
+      <tr><td>Thiago Oliveira</td><td>RM555485</td></tr>
     </table>
     <p><b>Vídeo pitch:</b> {{VIDEO}}</p>
   </div>
@@ -297,7 +297,7 @@ SELECT s.codigo, s.tipo, b.nome AS bairro, l.valor, l.data_hora,
     <li><code>config</code>: Swagger e carga de dados do perfil <code>dev</code>.</li>
   </ul>
 
-  <h3>Endpoints (27 operações, cobrindo GET, POST, PUT e DELETE)</h3>
+  <h3>Endpoints (28 operações, cobrindo GET, POST, PUT, PATCH e DELETE)</h3>
   <table>
     <tr><th style="width:12%">Método</th><th style="width:30%">Rota</th><th style="width:16%">Acesso</th><th>Descrição</th></tr>
     <tr><td><span class="tag tag-post">POST</span></td><td><code>/auth/register</code></td><td>público</td><td>Cadastra um cidadão (201, 400, 409)</td></tr>
@@ -313,6 +313,7 @@ SELECT s.codigo, s.tipo, b.nome AS bairro, l.valor, l.data_hora,
     <tr><td><span class="tag tag-put">PUT</span></td><td><code>/alertas/{id}/encerrar</code></td><td>ADMIN</td><td>Encerra um alerta (409 se já estiver encerrado)</td></tr>
     <tr><td><span class="tag tag-get">GET</span></td><td><code>/abrigos?bairroId=&amp;somenteComVaga=</code>, <code>/abrigos/{id}</code></td><td>logado</td><td>Lista e detalha abrigos</td></tr>
     <tr><td><span class="tag tag-post">POST</span> <span class="tag tag-put">PUT</span> <span class="tag tag-del">DELETE</span></td><td><code>/abrigos[/{id}]</code></td><td>ADMIN</td><td>CRUD de abrigos (400 se ocupadas &gt; capacidade)</td></tr>
+    <tr><td><span class="tag tag-put">PATCH</span></td><td><code>/abrigos/{id}/ocupacao</code></td><td>ADMIN</td><td>Ajuste atômico de ocupação. Body: <code>{"delta": int}</code> (−50 a 50). 409 se fora dos limites, 404 se não existe.</td></tr>
     <tr><td><span class="tag tag-post">POST</span> <span class="tag tag-get">GET</span></td><td><code>/relatos</code></td><td>logado</td><td>Envia relato. ADMIN vê todos e o cidadão vê os próprios</td></tr>
     <tr><td><span class="tag tag-put">PUT</span></td><td><code>/relatos/{id}/status</code></td><td>ADMIN</td><td>Marca como VERIFICADO ou DESCARTADO</td></tr>
     <tr><td><span class="tag tag-del">DELETE</span></td><td><code>/relatos/{id}</code></td><td>dono / ADMIN</td><td>Exclui o relato (403 se for de outra pessoa)</td></tr>
@@ -357,6 +358,14 @@ SELECT s.codigo, s.tipo, b.nome AS bairro, l.valor, l.data_hora,
     <tr><td>CT16</td><td>Classificação: crítico</td><td>rio 3.00 m e 5.50 m</td><td>CRITICO</td><td>Unid.</td><td class="ok">Passou</td></tr>
     <tr><td>CT17</td><td>Fluxo IoT ponta a ponta</td><td>simulador <code>--cenario enchente</code></td><td>Alerta ATENÇÃO e depois CRÍTICO, com o app mudando de cor</td><td>Manual</td><td class="ok">Passou</td></tr>
     <tr><td>CT18</td><td>App sem conexão</td><td>Rede derrubada com a tela inicial aberta</td><td>Aviso "Sem conexão" mostrando os últimos dados</td><td>Manual</td><td class="ok">Passou</td></tr>
+    <tr><td>CT19</td><td>Encerramento automático: 3 leituras descendo</td><td>Crítica + 1,0 / 1,0 / 0,9 no RIO-002</td><td>Situação do bairro volta a NORMAL</td><td>Auto</td><td class="ok">Passou</td></tr>
+    <tr><td>CT20</td><td>Sem encerramento: leituras subindo</td><td>Crítica + 1,0 / 1,5 / 1,7 no RIO-002</td><td>Situação continua CRITICO</td><td>Auto</td><td class="ok">Passou</td></tr>
+    <tr><td>CT21</td><td>Sem encerramento: apenas 2 normais</td><td>Crítica + 2 leituras de 1,0 m</td><td>Top-3 ainda inclui leitura crítica → CRITICO</td><td>Auto</td><td class="ok">Passou</td></tr>
+    <tr><td>CT22</td><td>Concorrência: sem alerta duplicado</td><td>8 threads críticas simultâneas do RIO-001</td><td>0 exceções, 8 leituras salvas, exatamente 1 alerta CRITICO ATIVO</td><td>Auto</td><td class="ok">Passou</td></tr>
+    <tr><td>CT23</td><td>PATCH ocupação: com vaga</td><td>PATCH /abrigos/{id}/ocupacao delta=+1 (abrigo com vaga)</td><td>200 e vagasOcupadas +1</td><td>Auto</td><td class="ok">Passou</td></tr>
+    <tr><td>CT24</td><td>PATCH ocupação: lotado</td><td>PATCH /abrigos/{id}/ocupacao delta=+1 (Igreja Sao Jose 60/60)</td><td>409 "Ocupacao fora dos limites do abrigo"</td><td>Auto</td><td class="ok">Passou</td></tr>
+    <tr><td>CT25</td><td>Relato longo com acentos aceito</td><td>~480 chars com acentos e apóstrofos</td><td>201 (semântica CHAR evita estouro)</td><td>Auto</td><td class="ok">Passou</td></tr>
+    <tr><td>CT26</td><td>500 apóstrofos estouram após escape</td><td>500 apóstrofos → 2500 chars após escape</td><td>400 Bad Request (não 409)</td><td>Auto</td><td class="ok">Passou</td></tr>
   </table>
 
   <h3>Execução: relatório do Maven Surefire</h3>
@@ -412,7 +421,9 @@ SELECT s.codigo, s.tipo, b.nome AS bairro, l.valor, l.data_hora,
     <tr><td>Proteção contra XSS</td><td>O texto livre dos relatos é salvo com HTML escapado (<code>HtmlUtils.htmlEscape</code>), e o React renderiza tudo como texto.</td><td>CT12, tela 07</td></tr>
     <tr><td>Autenticação dos sensores</td><td>Header <code>X-Sensor-Key</code> comparado em tempo constante (<code>MessageDigest.isEqual</code>).</td><td>CT10</td></tr>
     <tr><td>Erros sem vazamento</td><td>O <code>GlobalExceptionHandler</code> padroniza os erros e nunca devolve stack trace (<code>server.error.include-stacktrace=never</code>).</td><td>Log da API</td></tr>
-    <tr><td>Segredos e CORS</td><td>A chave JWT, as credenciais do banco e a chave dos sensores vêm de variáveis de ambiente. O CORS é restrito às origens configuradas, e a API é stateless (sem sessão).</td><td>application.properties</td></tr>
+    <tr><td>Segredos e CORS</td><td>A chave JWT, as credenciais do banco e a chave dos sensores vêm de variáveis de ambiente. O CORS é restrito às origens configuradas (incluindo PATCH), e a API é stateless (sem sessão).</td><td>application.properties</td></tr>
+    <tr><td><b>Prevenção de timing attack no login</b></td><td>Quando o e-mail não existe, um hash fixo gerado na inicialização (<code>passwordEncoder.encode(UUID)</code>) é comparado com BCrypt antes de lançar a exceção, nivelando o tempo de resposta e impedindo enumeração de e-mails por diferença de latência.</td><td>CT04</td></tr>
+    <tr><td><b>Integridade sob concorrência</b></td><td>Lock pessimista no bairro (<code>PESSIMISTIC_WRITE</code> via <code>travarPorId</code>) impede que threads paralelas criem alertas duplicados. Índice único condicional no Oracle (<code>ux_alerta_ativo</code>) garante a restrição no nível do banco. O PATCH de ocupação usa UPDATE atômico, sem ler e escrever em duas operações separadas.</td><td>CT22, CT24</td></tr>
   </table>
 </section>
 
@@ -434,13 +445,22 @@ SELECT s.codigo, s.tipo, b.nome AS bairro, l.valor, l.data_hora,
     <div><b>3. Alerta</b>Cria ATENÇÃO ou CRÍTICO para o bairro, sem duplicar. O CRÍTICO encerra os de ATENÇÃO.</div><span>→</span>
     <div><b>4. App</b>A tela inicial consulta <code>/bairros/{id}/situacao</code> e muda de cor.</div>
   </div>
-  <p>O simulador tem três cenários reproduzíveis:</p>
+  <h3>Encerramento automático (histerese)</h3>
+  <div class="fluxo">
+    <div><b>Leitura NORMAL</b>O LeituraService verifica todos os sensores ativos do bairro.</div><span>→</span>
+    <div><b>Top-3 leituras</b>Pega as 3 mais recentes de cada sensor (ordem: data_hora DESC, id DESC).</div><span>→</span>
+    <div><b>Critério</b>Todas abaixo de 90 % do limiteAlerta <b>E</b> a mais recente ≤ a mais antiga (descendo ou estável).</div><span>→</span>
+    <div><b>Se normalizado</b>Encerra todos os alertas ATIVO do bairro automaticamente.</div>
+  </div>
+
+  <p>O simulador tem quatro cenários reproduzíveis:</p>
   <ul>
     <li><code>normal</code>: valores baixos.</li>
     <li><code>chuva</code>: chega até ATENÇÃO.</li>
     <li><code>enchente</code>: sobe de forma previsível até CRÍTICO.</li>
+    <li><code>recuo</code>: rio desce de 3,2 m em passos de 0,4 m até 0,9 m (chuva cai de 40 para 5 mm/h). Demonstra o encerramento automático ao vivo.</li>
   </ul>
-  <p>Execução real do cenário <code>enchente</code> (as telas 03 e 04 da Parte 4 são o antes e o depois deste log):</p>
+  <p>Execução real do cenário <code>enchente</code> seguido de <code>recuo</code> (as telas 03 e 04 da Parte 4 são o antes e o depois deste log):</p>
   <pre>{{LOG_SIM}}</pre>
 </section>
 
